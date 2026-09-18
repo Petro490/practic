@@ -1,0 +1,50 @@
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+def multiply(a, b):
+    return a * b
+
+def divide(a, b):
+    if b == 0:
+        print("Ошибка: деление на ноль!")
+        return None
+    return a / b
+
+def get_operation():
+    print("\nДоступные операции: + (сложение), - (вычитание), * (умножение), / (деление)")
+    operation = input("Выберите операцию: ").strip()
+    return operation
+
+def main():
+    print("Добро пожаловать в калькулятор!")
+    
+    while True:
+        try:
+            num1 = float(input("Введите первое число: "))
+            num2 = float(input("Введите второе число: "))
+        except ValueError:
+            print("Ошибка: введите корректное число.")
+            continue
+        
+        operation = get_operation()
+        
+        if operation in ['+', '-', '*', '/']:
+            result = {
+                '+': add,
+                '-': subtract,
+                '*': multiply,
+                '/': divide
+            }[operation](num1, num2)
+            if result is not None:
+                print(f"Результат: {result}")
+        else:
+            print("Неизвестная операция. Попробуйте ещё раз.")
+        
+        continue_calc = input("Хотите выполнить ещё одно вычисление? (да/нет): ").strip().lower()
+        if continue_calc != 'да':
+            print("До свидания!")
+            break
+            

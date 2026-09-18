@@ -1,0 +1,53 @@
+import random
+from datetime import datetime
+
+# База знаний: часто задаваемые вопросы и ответы
+knowledge_base = {
+    "привет": "Здравствуйте! Чем могу помочь?",
+    "как дела": "Всё отлично! Чем могу быть полезен?",
+    "что ты умеешь": "Я могу отвечать на вопросы, выполнять простые вычисления, запоминать историю общения.",
+    "время": "Сейчас " + datetime.now().strftime("%H:%M:%S"),
+    "пока" | "прощай" | "до свидания" | "exit" | "выход": "До свидания! Хорошего дня!",
+}
+
+# История общения
+history = 
+
+def get_response(user_input):
+    """
+    Обрабатывает пользовательский ввод и возвращает соответствующий ответ.
+    """
+    user_input = user_input.lower().strip()
+    
+    # Проверяем, есть ли точный ответ в базе
+    if user_input in knowledge_base:
+        return knowledge_base[user_input]
+    
+    # Проверяем, является ли запрос математическим выражением
+    if all(char.isdigit() or char in '+-*/(). ' for char in user_input):
+        try:
+            result = eval(user_input)  # Вычисляем выражение
+            history.append(f"Пользователь: {user_input} | Результат: {result}")  # Сохраняем в историю
+            return f"Результат: {result}"
+        except Exception as e:
+            error_msg = f"Ошибка: {str(e)}"
+            history.append(error_msg)
+            return f"Ошибка: {error_msg}"
+    
+    # Если запрос не распознан, добавляем в историю неудачную попытку и предлагаем уточнить
+    history.append(f"Пользователь: {user_input} | [Запрос не распознан]")
+    return "Извините, я не поняла этот вопрос. Попробуйте ещё раз или задайте что-то из списка."
+
+def main():
+    print("Бот: Привет! Я ваш виртуальный помощник. Как могу вам помочь?")
+    while True:
+        user_input = input("Вы: ")
+        response = get_response(user_input)
+        print(f"Бот: {response}")
+        
+        # Завершаем цикл, если пользователь отправил команду выхода
+        if user_input.lower() in ["пока", "прощай", "exit", "выход"]:
+            break
+
+if __name__ == "__main__":
+    main()

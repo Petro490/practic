@@ -1,0 +1,20 @@
+import json
+
+def save_conversation(conversation, filename="conversation.json"):
+    try:
+        with open(filename, "w", encoding='utf-8') as file:
+            json.dump(conversation, file, ensure_ascii=False, indent=2)  # ensure_ascii=False для кириллицы, indent=2 для читаемости
+        print(f"Файл {filename} успешно сохранён")
+    except (IOError, TypeError) as e:  # TypeError может возникнуть, если в данных есть несериализуемые типы (например, datetime)
+        print(f"Ошибка при сохранении файла {filename}: {e}")
+
+def load_conversation(filename="conversation.json"):
+    try:
+        with open(filename, "r", encoding='utf-8') as file:
+            return json.load(file)  # автоматически распарсит JSON в Python-объект
+    except FileNotFoundError:
+        print("Файл не найден.")
+        return
+    except json.JSONDecodeError as e:
+        print(f"Ошибка парсинга JSON в файле {filename}: {e}")
+        return

@@ -1,1 +1,144 @@
+--задание 1.1
+SELECT DISTINCT id 
+FROM hosts 
+WHERE host_since = '2020-04-06'
+
+--Задание 1.2
+SELECT DISTINCT reviewer_id 
+FROM reviews 
+WHERE date = '2020-04-06'
+
+--Задание 1.3
+SELECT COUNT(*) FROM (
+    SELECT id FROM hosts WHERE host_since = '2020-04-06'
+    UNION ALL
+    SELECT reviewer_id FROM reviews WHERE date = '2020-04-06'
+) as combined_all
+--Число 7
+
+--Задание 1.4
+SELECT COUNT(*) FROM (
+    SELECT id FROM hosts WHERE host_since = '2020-04-06'
+    UNION
+    SELECT reviewer_id FROM reviews WHERE date = '2020-04-06'
+) as unique_combined
+--Число 6
+
+--часть 2
+--Задание 2.1
+SELECT id FROM hosts
+UNION ALL
+SELECT reviewer_id FROM reviews
+
+--Задание 2.2.
+SELECT COUNT(*) 
+FROM (
+    SELECT id FROM hosts
+    UNION ALL
+    SELECT reviewer_id FROM reviews
+) AS total_rows
+--число 236713
+
+--задание 2.3
+SELECT COUNT(*) 
+FROM (
+    SELECT id FROM hosts
+    UNION
+    SELECT reviewer_id FROM reviews
+) AS unique_rows
+--число 222406
+
+--Задача 2
+--Задание 2.1
+SELECT 
+    host_id, 
+    COUNT(*) AS listings_count, 
+    AVG(price) AS avg_price
+FROM listings
+GROUP BY host_id
+
+--Задание 2.2
+SELECT *
+FROM hosts h
+JOIN (
+    SELECT 
+        host_id, 
+        COUNT(*) AS listings_count, 
+        AVG(price) AS avg_price
+FROM listings
+GROUP BY host_id
+) l ON h.id = l.host_id
+
+--Задание 2.3
+SELECT 
+    id AS host_id,
+    host_since AS registration_date,
+    name as name_host,
+    l.listings_count,
+    l.avg_price
+FROM hosts h
+JOIN (
+    SELECT 
+        host_id, 
+        COUNT(*) AS listings_count, 
+        AVG(price) AS avg_price
+    FROM listings
+    GROUP BY host_id
+) l ON h.id = l.host_id
+
+--Задача3
+--Задание 3.1
+SELECT *
+FROM reviews r
+JOIN listings l ON r.listing_id = l.id
+JOIN hosts h ON l.host_id = h.id
+
+--Задание 3.2
+SELECT COUNT(DISTINCT l.host_id) AS unique_hosts_count
+FROM reviews r
+JOIN listings l ON r.listing_id = l.id
+
+--число 2764
+
+--Задание 3.3
+SELECT COUNT(DISTINCT l.host_id) AS unique_hosts_2020
+FROM reviews r
+JOIN listings l ON r.listing_id = l.id
+WHERE r.date LIKE '2020%'
+
+--число 874
+
+--Задание 3.4
+SELECT COUNT(DISTINCT l.host_id) AS unique_hosts_expensive
+FROM reviews r
+JOIN listings l ON r.listing_id = l.id
+WHERE l.price >= 100
+
+--число 1240
+
+--Задание 3.5
+SELECT COUNT(DISTINCT l.host_id) AS unique_superhosts_expensive
+FROM reviews r
+JOIN listings l ON r.listing_id = l.id
+JOIN hosts h ON l.host_id = h.id
+WHERE l.price >= 100 AND h.is_super_host = 't'
+
+--число 248
+
+--Задание 3.6
+SELECT COUNT(DISTINCT l.host_id) AS unique_superhosts_expensive_2020
+FROM reviews r
+JOIN listings l ON r.listing_id = l.id
+JOIN hosts h ON l.host_id = h.id
+WHERE l.price >= 100 
+  AND h.is_super_host = 't' 
+  AND r.date LIKE '2020%'
+
+--число 166
+
+--Задача 4
+--Задание 4.1
+
+
+
 

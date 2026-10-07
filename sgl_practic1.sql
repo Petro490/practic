@@ -1,19 +1,19 @@
 --задание 1.1
 SELECT DISTINCT id 
 FROM hosts 
-WHERE host_since = '2020-04-06'
+WHERE host_since = '2020-04-06';
 
 --Задание 1.2
 SELECT DISTINCT reviewer_id 
 FROM reviews 
-WHERE date = '2020-04-06'
+WHERE date = '2020-04-06';
 
 --Задание 1.3
 SELECT COUNT(*) FROM (
     SELECT id FROM hosts WHERE host_since = '2020-04-06'
     UNION ALL
     SELECT reviewer_id FROM reviews WHERE date = '2020-04-06'
-) as combined_all
+) as combined_all;
 --Число 7
 
 --Задание 1.4
@@ -21,14 +21,14 @@ SELECT COUNT(*) FROM (
     SELECT id FROM hosts WHERE host_since = '2020-04-06'
     UNION
     SELECT reviewer_id FROM reviews WHERE date = '2020-04-06'
-) as unique_combined
+) as unique_combined;
 --Число 6
 
 --часть 2
 --Задание 2.1
 SELECT id FROM hosts
 UNION ALL
-SELECT reviewer_id FROM reviews
+SELECT reviewer_id FROM reviews;
 
 --Задание 2.2.
 SELECT COUNT(*) 
@@ -36,7 +36,7 @@ FROM (
     SELECT id FROM hosts
     UNION ALL
     SELECT reviewer_id FROM reviews
-) AS total_rows
+) AS total_rows;
 --число 236713
 
 --задание 2.3
@@ -45,7 +45,7 @@ FROM (
     SELECT id FROM hosts
     UNION
     SELECT reviewer_id FROM reviews
-) AS unique_rows
+) AS unique_rows;
 --число 222406
 
 --Задача 2
@@ -55,7 +55,7 @@ SELECT
     COUNT(*) AS listings_count, 
     AVG(price) AS avg_price
 FROM listings
-GROUP BY host_id
+GROUP BY host_id;
 
 --Задание 2.2
 SELECT *
@@ -67,7 +67,20 @@ JOIN (
         AVG(price) AS avg_price
 FROM listings
 GROUP BY host_id
-) l ON h.id = l.host_id
+) l ON h.id = l.host_id;
+
+--или
+WITH listings_summary AS (
+    SELECT 
+        host_id, 
+        COUNT(*) AS listings_count, 
+        AVG(price) AS avg_price  
+    FROM listings  
+    GROUP BY host_id  
+)
+SELECT *
+FROM hosts h  
+JOIN listings_summary l ON h.id = l.host_id;
 
 --Задание 2.3
 SELECT 
@@ -84,19 +97,19 @@ JOIN (
         AVG(price) AS avg_price
     FROM listings
     GROUP BY host_id
-) l ON h.id = l.host_id
+) l ON h.id = l.host_id;
 
 --Задача3
 --Задание 3.1
 SELECT *
 FROM reviews r
 JOIN listings l ON r.listing_id = l.id
-JOIN hosts h ON l.host_id = h.id
+JOIN hosts h ON l.host_id = h.id;
 
 --Задание 3.2
 SELECT COUNT(DISTINCT l.host_id) AS unique_hosts_count
 FROM reviews r
-JOIN listings l ON r.listing_id = l.id
+JOIN listings l ON r.listing_id = l.id;
 
 --число 2764
 
@@ -104,7 +117,8 @@ JOIN listings l ON r.listing_id = l.id
 SELECT COUNT(DISTINCT l.host_id) AS unique_hosts_2020
 FROM reviews r
 JOIN listings l ON r.listing_id = l.id
-WHERE r.date LIKE '2020%'
+WHERE r.date BETWEEN '2020-01-01' AND '2020-12-31';
+
 
 --число 874
 

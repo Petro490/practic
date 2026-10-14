@@ -111,6 +111,121 @@ SELECT
 --Tesla Model 3	         2020-03-01	     John	           Los Angeles	         New York (или Boston)
 
 --Задача2
+--Задание 2.1
+SELECT u.first_name || ' from ' || u.city AS user_location
+FROM order_items oi
+JOIN orders o ON oi.order_id = o.id
+JOIN users u ON o.user_id = u.id
+GROUP BY u.first_name, u.city, u.id
+ORDER BY SUM(oi.quantity) DESC
+LIMIT 1;
+
+--John from Los Angeles
+
+--задание 2.2
+
+SELECT LENGTH(email) AS email_length
+FROM users
+WHERE id = 9;
+
+-- ответ 19
+
+--задание 2.3
+UPDATE users
+SET email = REPLACE(email, 'example', 'Tesla');
+
+
+--Задача 3
+--задание 3.1
+-- Создание представления
+CREATE OR REPLACE VIEW los_angeles_users AS
+SELECT *
+FROM users
+WHERE city = 'Los Angeles';
+
+-- Обращение к созданному представлению
+SELECT * FROM los_angeles_users;
+
+
+--Задание 3.2
+-- Создание табличного выражения и немедленное обращение к нему
+WITH los_angeles_users_cte AS (
+    SELECT *
+    FROM users
+    WHERE city = 'Los Angeles'
+)
+SELECT * FROM los_angeles_users_cte;
+
+
+--немного улучим запросы с рассчетом на будщее расширение
+-- 1. Создаем материализованное представление
+CREATE MATERIALIZED VIEW mv_los_angeles_users AS
+SELECT id, first_name, last_name, email, city  -- Рекомендуется перечислять колонки явно
+FROM users
+WHERE city = 'Los Angeles';
+
+-- 2. Создаем обязательный УНИКАЛЬНЫЙ индекс по колонке id
+CREATE UNIQUE INDEX idx_mv_la_users_id ON mv_los_angeles_users(id);
+
+-- 3. Пример быстрого фонового обновления данных (без блокировки запросов SELECT)
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_los_angeles_users;
+
+-- 4. Обращение к представлению (работает мгновенно)
+SELECT * FROM mv_los_angeles_users;
+
+
+--Задача 4 
+--задание 4.1.
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_item_id ON order_items(item_id);
+
+--задание 4.2
+EXPLAIN SELECT * FROM order_items WHERE order_id = 1 AND item_id = 2;
+
+
+-- Если в таблице мало строк (как в текущем тестовом датасете), 
+-- планировщик может выбрать последовательное сканирование (Seq Scan), так как оно быстрее для крошечных объемов.
+
+-- Для детального анализа со сбором реального времени выполнения используйте:
+EXPLAIN ANALYZE SELECT * FROM order_items WHERE order_id = 1 AND item_id = 2;
+
+--"Seq Scan on order_items  (cost=0.00..1.20 rows=1 width=16) (actual time=0.027..0.030 rows=1 loops=1)"
+--"  Filter: ((order_id = 1) AND (item_id = 2))"
+--"  Rows Removed by Filter: 12"
+--"Planning Time: 0.176 ms"
+--"Execution Time: 0.055 ms"
+
+
+-- Задача 5
+--задание 5.1
+
+SELECT 
+    id,
+    name,
+    price,
+    RANK() OVER (ORDER BY price DESC) AS price_rank
+FROM items;
+
+--Задание 5.2
+
+WITH daily_sales AS (
+    SELECT 
+        o.start_date AS order_date,
+        SUM(oi.quantity) AS daily_cars_sold
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.id
+    GROUP BY o.start_date
+)
+SELECT 
+    order_date,
+    daily_cars_sold,
+    SUM(daily_cars_sold) OVER (ORDER BY order_date ASC) AS cumulative_cars_sold
+FROM daily_sales
+ORDER BY order_date ASC;
+
+
+--ВСе кода работают, проверно в PostgreSql
+
 
 
 

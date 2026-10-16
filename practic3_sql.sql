@@ -51,6 +51,24 @@ ORDER BY max_avg_price DESC
 LIMIT 1;
 
 --74990 (Для городов New York и Boston)
+--или
+SELECT city, max_avg_price
+FROM (
+    SELECT 
+        u.city,
+        ROUND(AVG(i.price)::numeric, 2) AS max_avg_price,
+        -- Присваиваем 1 место всем городам с одинаковой максимальной ценой
+        DENSE_RANK() OVER (ORDER BY ROUND(AVG(i.price)::numeric, 2) DESC) AS price_rank
+    FROM order_items oi
+    JOIN items i ON oi.item_id = i.id
+    JOIN orders o ON oi.order_id = o.id
+    JOIN users u ON o.user_id = u.id
+    GROUP BY u.city
+) subquery
+WHERE price_rank = 1;
+
+
+
 
 --Для оптимизации создадим индексы
 -- Индексы для таблицы заказов (orders)
@@ -132,7 +150,7 @@ WHERE id = 9;
 
 --задание 2.3
 UPDATE users
-SET email = REPLACE(email, 'example', 'Tesla');
+SET email = REPLACE(email, 'example', 'tesla');
 
 
 --Задача 3
